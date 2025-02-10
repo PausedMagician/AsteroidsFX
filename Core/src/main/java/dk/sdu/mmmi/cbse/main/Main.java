@@ -32,10 +32,13 @@ public class Main extends Application {
         launch(Main.class);
     }
 
+    private Text logText = new Text(10, 30, "Objects: 0\nEnemies: 0\nAsteroids: 0\nBullets: 0");
+
     @Override
     public void start(Stage window) throws Exception {
         Text text = new Text(10, 20, "Destroyed asteroids: 0");
         gameWindow.setPrefSize(gameData.getDisplayWidth(), gameData.getDisplayHeight());
+        gameWindow.getChildren().add(logText);
         gameWindow.getChildren().add(text);
 
         Scene scene = new Scene(gameWindow);
@@ -71,12 +74,12 @@ public class Main extends Application {
 
         // Lookup all Game Plugins using ServiceLoader
         for (IGamePluginService iGamePlugin : getPluginServices()) {
+            System.out.println(iGamePlugin.getClass().getName());
             iGamePlugin.start(gameData, world);
         }
         for (Entity entity : world.getEntities()) {
-            Polygon polygon = new Polygon(entity.getPolygonCoordinates());
-            polygons.put(entity, polygon);
-            gameWindow.getChildren().add(polygon);
+            polygons.put(entity, entity.getPolygon());
+            gameWindow.getChildren().add(entity.getPolygon());
         }
         render();
         window.setScene(scene);
@@ -86,8 +89,24 @@ public class Main extends Application {
 
     private void render() {
         new AnimationTimer() {
+            long lastUpdate = 0;
+            float avgFps = 0;
+
             @Override
             public void handle(long now) {
+                int fps = 61;
+                // Fps 30
+                if (now/1000000 - lastUpdate/1000000 < 1000 / (fps/2)) {
+                    try {
+                        Thread.sleep(1000 / (fps/2) - (now/1000000 - lastUpdate/1000000));
+                    } catch (InterruptedException ex) {
+                    }
+                }
+
+                avgFps = 0.9f * avgFps + 0.1f * (1 / ((now - lastUpdate) / 1000000000.0f));
+
+                logText.setText("Objects: " + world.getEntities().size() + "\nEnemies: " + world.getEntities().stream().filter(e -> e.getClass().getSimpleName().equals("Enemy")).count() + "\nAsteroids: " + world.getEntities().stream().filter(e -> e.getClass().getSimpleName().equals("Asteroid")).count() + "\nBullets: " + world.getEntities().stream().filter(e -> e.getClass().getSimpleName().equals("Bullet")).count() + "\nFPS: " + avgFps);
+                lastUpdate = now;
                 update();
                 draw();
                 gameData.getKeys().update();
@@ -117,7 +136,7 @@ public class Main extends Application {
         for (Entity entity : world.getEntities()) {                      
             Polygon polygon = polygons.get(entity);
             if (polygon == null) {
-                polygon = new Polygon(entity.getPolygonCoordinates());
+                polygon = entity.getPolygon();
                 polygons.put(entity, polygon);
                 gameWindow.getChildren().add(polygon);
             }

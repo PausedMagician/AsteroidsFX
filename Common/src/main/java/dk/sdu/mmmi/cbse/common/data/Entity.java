@@ -3,11 +3,14 @@ package dk.sdu.mmmi.cbse.common.data;
 import java.io.Serializable;
 import java.util.UUID;
 
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Polygon;
+
 public class Entity implements Serializable {
 
     private final UUID ID = UUID.randomUUID();
     
-    private double[] polygonCoordinates;
+    private Polygon polygon;
     private double x;
     private double y;
     private double rotation;
@@ -20,11 +23,11 @@ public class Entity implements Serializable {
 
 
     public void setPolygonCoordinates(double... coordinates ) {
-        this.polygonCoordinates = coordinates;
+        this.polygon = new Polygon(coordinates);
     }
 
-    public double[] getPolygonCoordinates() {
-        return polygonCoordinates;
+    public Polygon getPolygon() {
+        return polygon;
     }
        
 
@@ -59,5 +62,9 @@ public class Entity implements Serializable {
         
     public float getRadius() {
         return this.radius;
+    }
+
+    public void setColor(String string) {
+        this.polygon.setFill(Paint.valueOf(string));
     }
 }

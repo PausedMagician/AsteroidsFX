@@ -19,7 +19,8 @@ public class PlayerControlSystem implements IEntityProcessingService {
     @Override
     public void process(GameData gameData, World world) {
             
-        for (Entity player : world.getEntities(Player.class)) {
+        for (Entity ent : world.getEntities(Player.class)) {
+            Player player = (Player) ent;
             if (gameData.getKeys().isDown(GameKeys.LEFT)) {
                 player.setRotation(player.getRotation() - 5);                
             }
@@ -32,9 +33,16 @@ public class PlayerControlSystem implements IEntityProcessingService {
                 player.setX(player.getX() + changeX);
                 player.setY(player.getY() + changeY);
             }
-            if(gameData.getKeys().isDown(GameKeys.SPACE)) {                
+            if(gameData.getKeys().isDown(GameKeys.SPACE)) {     
+                long now = System.currentTimeMillis();
+                long timeSinceLastFire = now - player.getLastShot();
+                if (timeSinceLastFire < 200) {
+                    return;
+                }
+                player.setLastShot(now);
+                System.out.println("Time since last fire: " + timeSinceLastFire);
                 getBulletSPIs().stream().findFirst().ifPresent(
-                        spi -> {world.addEntity(spi.createBullet(player, gameData));}
+                    spi -> {world.addEntity(spi.createBullet(player, gameData));}
                 );
             }
             
