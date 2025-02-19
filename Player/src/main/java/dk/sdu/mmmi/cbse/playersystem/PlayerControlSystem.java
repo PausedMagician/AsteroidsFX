@@ -45,24 +45,19 @@ public class PlayerControlSystem implements IEntityProcessingService {
                     spi -> {world.addEntity(spi.createBullet(player, gameData));}
                 );
             }
-            
-        if (player.getX() < 0) {
-            player.setX(1);
-        }
+            if (player.getX() < 1) {
+                player.setX(gameData.getDisplayWidth());
+            }
+            else if (player.getX() > gameData.getDisplayWidth()) {
+                player.setX(1);
+            }
+            if (player.getY() < 1) {
+                player.setY(gameData.getDisplayHeight());
+            }
+            else if (player.getY() > gameData.getDisplayHeight()) {
+                player.setY(1);
+            }
 
-        if (player.getX() > gameData.getDisplayWidth()) {
-            player.setX(gameData.getDisplayWidth()-1);
-        }
-
-        if (player.getY() < 0) {
-            player.setY(1);
-        }
-
-        if (player.getY() > gameData.getDisplayHeight()) {
-            player.setY(gameData.getDisplayHeight()-1);
-        }
-
-                                        
         }
     }
 

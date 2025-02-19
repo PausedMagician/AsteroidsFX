@@ -3,6 +3,7 @@ package dk.sdu.mmmi.cbse.common.data;
 import java.io.Serializable;
 import java.util.UUID;
 
+import javafx.scene.CacheHint;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
 
@@ -24,6 +25,7 @@ public class Entity implements Serializable {
 
     public void setPolygonCoordinates(double... coordinates ) {
         this.polygon = new Polygon(coordinates);
+        this.polygon.setCacheHint(CacheHint.SPEED);
     }
 
     public Polygon getPolygon() {
